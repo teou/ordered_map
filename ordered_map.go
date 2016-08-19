@@ -82,7 +82,7 @@ func (om *OrderedMap) Iter() <-chan *KVPair {
 /*
 Beware, Iterator leaks goroutines if we do not fully traverse the map.
 For most cases, `IterFunc()` should work as an iterator.
- */
+*/
 func (om *OrderedMap) UnsafeIter() <-chan *KVPair {
 	keys := make(chan *KVPair)
 	go func() {
@@ -114,7 +114,28 @@ func (om *OrderedMap) IterFunc() func() (*KVPair, bool) {
 	}
 }
 
+func (om *OrderedMap) RevIterFunc() func() (*KVPair, bool) {
+	curr := om.root
+	for {
+		if curr.Next == nil || curr.Next == curr || curr == om.root {
+			break
+		}
+		curr = curr.Next
+	}
+
+	start := curr
+	curr = start.Prev
+	return func() (*KVPair, bool) {
+		for curr != start {
+			tmp := curr
+			curr = curr.Prev
+			v, _ := om.store[tmp.Value]
+			return &KVPair{tmp.Value, v}, true
+		}
+		return nil, false
+	}
+}
+
 func (om *OrderedMap) Len() int {
 	return len(om.store)
 }
-
