@@ -1,3 +1,5 @@
+# forked from cevaris, add rev iter func
+
 # Ordered Map for golang
 
 [![Build Status](https://travis-ci.org/cevaris/ordered_map.svg?branch=master)](https://travis-ci.org/cevaris/ordered_map)
